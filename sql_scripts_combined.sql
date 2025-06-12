@@ -1,0 +1,591 @@
+-- Create Customer Table
+CREATE TABLE Customer (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    FName VARCHAR(50),
+    MName VARCHAR(50),
+    LName VARCHAR(50),
+    PhoneNumber VARCHAR(15) UNIQUE NOT NULL,
+    DrivingLicense VARCHAR(20) UNIQUE NOT NULL,
+    EmailID VARCHAR(100) UNIQUE NOT NULL,
+    Address TEXT,
+    IsPremium BOOLEAN,
+    MemberID INT NULL,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert Data into Customer Table
+INSERT INTO Customer (FName, MName, LName, PhoneNumber, DrivingLicense, EmailID, Address, IsPremium, MemberID)
+VALUES 
+('John', 'A', 'Doe', '9876543210', 'DL123456', 'john.doe@email.com', '123 Main St, NY', TRUE, 1001),
+('Alice', 'B', 'Smith', '9123456789', 'DL654321', 'alice.smith@email.com', '456 Elm St, CA', FALSE, NULL),
+('Robert', 'C', 'Johnson', '9988776655', 'DL789123', 'robert.j@email.com', '789 Oak St, TX', TRUE, 1002),
+('Emma', 'D', 'Brown', '9765432109', 'DL567890', 'emma.b@email.com', '567 Pine St, FL', FALSE, NULL),
+('Michael', 'E', 'Williams', '9456789012', 'DL321654', 'michael.w@email.com', '678 Cedar St, IL', TRUE, 1003);
+
+-- Create Car Table
+CREATE TABLE Car (
+    RegistrationNumber VARCHAR(20) PRIMARY KEY,
+    AvailabilityFlag BOOLEAN NOT NULL,
+    ModelYear INT,
+    Model VARCHAR(50),
+    MadeBy VARCHAR(50),
+    Mileage DECIMAL(5,2)
+);
+
+-- Insert Data into Car Table
+INSERT INTO Car (RegistrationNumber, AvailabilityFlag, ModelYear, Model, MadeBy, Mileage)
+VALUES 
+('ABC123', TRUE, 2022, 'Model S', 'Tesla', 150.5),
+('XYZ456', TRUE, 2021, 'Civic', 'Honda', 40.0),
+('LMN789', FALSE, 2020, 'Corolla', 'Toyota', 42.5),
+('PQR321', TRUE, 2019, 'Camry', 'Toyota', 38.0),
+('DEF654', FALSE, 2023, 'Mustang', 'Ford', 25.0);
+
+-- Create Location Table
+CREATE TABLE Location (
+    LocationID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100),
+    State VARCHAR(50),
+    City VARCHAR(50),
+    ZipCode VARCHAR(10),
+    Street VARCHAR(100)
+);
+
+-- Insert Data into Location Table
+INSERT INTO Location (Name, State, City, ZipCode, Street)
+VALUES 
+('Downtown', 'NY', 'New York', '10001', '5th Ave'),
+('City Center', 'CA', 'Los Angeles', '90001', 'Main St'),
+('Airport Hub', 'TX', 'Dallas', '75001', 'Airport Rd'),
+('Suburb Branch', 'FL', 'Miami', '33101', 'Palm St'),
+('Metro Station', 'IL', 'Chicago', '60007', 'Railway Ave');
+
+-- Create Car Category Table
+CREATE TABLE CarCategory (
+    CategoryID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(50),
+    NumberOfLuggage INT,
+    NumberOfPerson INT,
+    CostPerDay DECIMAL(8,2),
+    LateFeePerHour DECIMAL(8,2)
+);
+
+-- Insert Data into CarCategory Table
+INSERT INTO CarCategory (Name, NumberOfLuggage, NumberOfPerson, CostPerDay, LateFeePerHour)
+VALUES 
+('Economy', 2, 4, 30.00, 5.00),
+('SUV', 4, 7, 70.00, 10.00),
+('Luxury', 3, 5, 120.00, 20.00),
+('Convertible', 1, 2, 90.00, 15.00),
+('Minivan', 5, 8, 80.00, 12.00);
+
+-- Create Booking Table
+CREATE TABLE Booking (
+    BookingID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT,
+    CarID VARCHAR(20),
+    PickUpLocation INT,
+    DropOffLocation INT,
+    StartDate DATE,
+    EndDate DATE,
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
+    FOREIGN KEY (CarID) REFERENCES Car(RegistrationNumber),
+    FOREIGN KEY (PickUpLocation) REFERENCES Location(LocationID),
+    FOREIGN KEY (DropOffLocation) REFERENCES Location(LocationID)
+);
+
+-- Insert Data into Booking Table
+INSERT INTO Booking (CustomerID, CarID, PickUpLocation, DropOffLocation, StartDate, EndDate)
+VALUES 
+(1, 'ABC123', 1, 2, '2025-02-10', '2025-02-15'),
+(2, 'XYZ456', 2, 3, '2025-02-11', '2025-02-16'),
+(3, 'LMN789', 3, 4, '2025-02-12', '2025-02-17'),
+(4, 'PQR321', 4, 5, '2025-02-13', '2025-02-18'),
+(5, 'DEF654', 5, 1, '2025-02-14', '2025-02-19');
+
+-- Create Billing Table
+CREATE TABLE Billing (
+    BillingID INT PRIMARY KEY AUTO_INCREMENT,
+    BookingID INT,
+    LateFee DECIMAL(8,2),
+    AmountDiscounted DECIMAL(8,2),
+    TotalAmount DECIMAL(10,2),
+    TaxAmount DECIMAL(8,2),
+    Status VARCHAR(50),
+    BillingDate DATE,
+    FOREIGN KEY (BookingID) REFERENCES Booking(BookingID)
+);
+
+-- Insert Data into Billing Table
+INSERT INTO Billing (BookingID, LateFee, AmountDiscounted, TotalAmount, TaxAmount, Status, BillingDate)
+VALUES 
+(1, 10.00, 5.00, 150.00, 15.00, 'Paid', '2025-02-16'),
+(2, 0.00, 10.00, 200.00, 20.00, 'Pending', '2025-02-17'),
+(3, 15.00, 0.00, 180.00, 18.00, 'Paid', '2025-02-18'),
+(4, 0.00, 5.00, 220.00, 22.00, 'Paid', '2025-02-19'),
+(5, 20.00, 10.00, 250.00, 25.00, 'Pending', '2025-02-20');
+
+-- Create Discount Table
+CREATE TABLE Discount (
+    DiscountID INT PRIMARY KEY AUTO_INCREMENT,
+    Code VARCHAR(20),
+    Name VARCHAR(50),
+    ExpiryDate DATE,
+    DiscountPercentage DECIMAL(5,2)
+);
+
+-- Insert Data into Discount Table
+INSERT INTO Discount (Code, Name, ExpiryDate, DiscountPercentage)
+VALUES 
+('WELCOME10', 'New User Discount', '2025-12-31', 10.00),
+('SUMMER20', 'Summer Sale', '2025-06-30', 20.00),
+('VIP30', 'Premium Members', '2025-12-31', 30.00),
+('FESTIVE15', 'Festival Discount', '2025-12-25', 15.00),
+('FLASH5', 'Flash Sale', '2025-03-15', 5.00);
+
+-- Create Rental Car Insurance Table
+CREATE TABLE RentalCarInsurance (
+    InsuranceID INT PRIMARY KEY AUTO_INCREMENT,
+    Code VARCHAR(20),
+    Name VARCHAR(50),
+    CoverageType VARCHAR(50),
+    CostPerDay DECIMAL(8,2)
+);
+
+-- Insert Data into RentalCarInsurance Table
+INSERT INTO RentalCarInsurance (Code, Name, CoverageType, CostPerDay)
+VALUES 
+('BASIC', 'Basic Coverage', 'Collision', 5.00),
+('STANDARD', 'Standard Coverage', 'Collision + Theft', 10.00),
+('PREMIUM', 'Premium Coverage', 'Full Coverage', 20.00),
+('VIP', 'VIP Insurance', 'Full Coverage + Roadside', 25.00),
+('ECONOMY', 'Economy Plan', 'Basic Damage', 8.00);
+
+-- Create Customer Table
+CREATE TABLE Customer (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    FName VARCHAR(50),
+    MName VARCHAR(50),
+    LName VARCHAR(50),
+    PhoneNumber VARCHAR(15) UNIQUE NOT NULL,
+    DrivingLicense VARCHAR(20) UNIQUE NOT NULL,
+    EmailID VARCHAR(100) UNIQUE NOT NULL,
+    Address TEXT,
+    IsPremium BOOLEAN,
+    MemberID INT NULL,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert Data into Customer Table
+INSERT INTO Customer (FName, MName, LName, PhoneNumber, DrivingLicense, EmailID, Address, IsPremium, MemberID)
+VALUES 
+('John', 'A', 'Doe', '9876543210', 'DL123456', 'john.doe@email.com', '123 Main St, NY', TRUE, 1001),
+('Alice', 'B', 'Smith', '9123456789', 'DL654321', 'alice.smith@email.com', '456 Elm St, CA', FALSE, NULL),
+('Robert', 'C', 'Johnson', '9988776655', 'DL789123', 'robert.j@email.com', '789 Oak St, TX', TRUE, 1002),
+('Emma', 'D', 'Brown', '9765432109', 'DL567890', 'emma.b@email.com', '567 Pine St, FL', FALSE, NULL),
+('Michael', 'E', 'Williams', '9456789012', 'DL321654', 'michael.w@email.com', '678 Cedar St, IL', TRUE, 1003);
+
+-- Create Car Table
+CREATE TABLE Car (
+    RegistrationNumber VARCHAR(20) PRIMARY KEY,
+    AvailabilityFlag BOOLEAN NOT NULL,
+    ModelYear INT,
+    Model VARCHAR(50),
+    MadeBy VARCHAR(50),
+    Mileage DECIMAL(5,2)
+);
+
+-- Insert Data into Car Table
+INSERT INTO Car (RegistrationNumber, AvailabilityFlag, ModelYear, Model, MadeBy, Mileage)
+VALUES 
+('ABC123', TRUE, 2022, 'Model S', 'Tesla', 150.5),
+('XYZ456', TRUE, 2021, 'Civic', 'Honda', 40.0),
+('LMN789', FALSE, 2020, 'Corolla', 'Toyota', 42.5),
+('PQR321', TRUE, 2019, 'Camry', 'Toyota', 38.0),
+('DEF654', FALSE, 2023, 'Mustang', 'Ford', 25.0);
+
+-- Create Location Table
+CREATE TABLE Location (
+    LocationID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100),
+    State VARCHAR(50),
+    City VARCHAR(50),
+    ZipCode VARCHAR(10),
+    Street VARCHAR(100)
+);
+
+-- Insert Data into Location Table
+INSERT INTO Location (Name, State, City, ZipCode, Street)
+VALUES 
+('Downtown', 'NY', 'New York', '10001', '5th Ave'),
+('City Center', 'CA', 'Los Angeles', '90001', 'Main St'),
+('Airport Hub', 'TX', 'Dallas', '75001', 'Airport Rd'),
+('Suburb Branch', 'FL', 'Miami', '33101', 'Palm St'),
+('Metro Station', 'IL', 'Chicago', '60007', 'Railway Ave');
+
+-- Create Car Category Table
+CREATE TABLE CarCategory (
+    CategoryID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(50),
+    NumberOfLuggage INT,
+    NumberOfPerson INT,
+    CostPerDay DECIMAL(8,2),
+    LateFeePerHour DECIMAL(8,2)
+);
+
+-- Insert Data into CarCategory Table
+INSERT INTO CarCategory (Name, NumberOfLuggage, NumberOfPerson, CostPerDay, LateFeePerHour)
+VALUES 
+('Economy', 2, 4, 30.00, 5.00),
+('SUV', 4, 7, 70.00, 10.00),
+('Luxury', 3, 5, 120.00, 20.00),
+('Convertible', 1, 2, 90.00, 15.00),
+('Minivan', 5, 8, 80.00, 12.00);
+
+-- Create Booking Table
+CREATE TABLE Booking (
+    BookingID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT,
+    CarID VARCHAR(20),
+    PickUpLocation INT,
+    DropOffLocation INT,
+    StartDate DATE,
+    EndDate DATE,
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
+    FOREIGN KEY (CarID) REFERENCES Car(RegistrationNumber),
+    FOREIGN KEY (PickUpLocation) REFERENCES Location(LocationID),
+    FOREIGN KEY (DropOffLocation) REFERENCES Location(LocationID)
+);
+
+-- Insert Data into Booking Table
+INSERT INTO Booking (CustomerID, CarID, PickUpLocation, DropOffLocation, StartDate, EndDate)
+VALUES 
+(1, 'ABC123', 1, 2, '2025-02-10', '2025-02-15'),
+(2, 'XYZ456', 2, 3, '2025-02-11', '2025-02-16'),
+(3, 'LMN789', 3, 4, '2025-02-12', '2025-02-17'),
+(4, 'PQR321', 4, 5, '2025-02-13', '2025-02-18'),
+(5, 'DEF654', 5, 1, '2025-02-14', '2025-02-19');
+
+-- Create Billing Table
+CREATE TABLE Billing (
+    BillingID INT PRIMARY KEY AUTO_INCREMENT,
+    BookingID INT,
+    LateFee DECIMAL(8,2),
+    AmountDiscounted DECIMAL(8,2),
+    TotalAmount DECIMAL(10,2),
+    TaxAmount DECIMAL(8,2),
+    Status VARCHAR(50),
+    BillingDate DATE,
+    FOREIGN KEY (BookingID) REFERENCES Booking(BookingID)
+);
+
+-- Insert Data into Billing Table
+INSERT INTO Billing (BookingID, LateFee, AmountDiscounted, TotalAmount, TaxAmount, Status, BillingDate)
+VALUES 
+(1, 10.00, 5.00, 150.00, 15.00, 'Paid', '2025-02-16'),
+(2, 0.00, 10.00, 200.00, 20.00, 'Pending', '2025-02-17'),
+(3, 15.00, 0.00, 180.00, 18.00, 'Paid', '2025-02-18'),
+(4, 0.00, 5.00, 220.00, 22.00, 'Paid', '2025-02-19'),
+(5, 20.00, 10.00, 250.00, 25.00, 'Pending', '2025-02-20');
+
+-- Create Discount Table
+CREATE TABLE Discount (
+    DiscountID INT PRIMARY KEY AUTO_INCREMENT,
+    Code VARCHAR(20),
+    Name VARCHAR(50),
+    ExpiryDate DATE,
+    DiscountPercentage DECIMAL(5,2)
+);
+
+-- Insert Data into Discount Table
+INSERT INTO Discount (Code, Name, ExpiryDate, DiscountPercentage)
+VALUES 
+('WELCOME10', 'New User Discount', '2025-12-31', 10.00),
+('SUMMER20', 'Summer Sale', '2025-06-30', 20.00),
+('VIP30', 'Premium Members', '2025-12-31', 30.00),
+('FESTIVE15', 'Festival Discount', '2025-12-25', 15.00),
+('FLASH5', 'Flash Sale', '2025-03-15', 5.00);
+
+-- Create Rental Car Insurance Table
+CREATE TABLE RentalCarInsurance (
+    InsuranceID INT PRIMARY KEY AUTO_INCREMENT,
+    Code VARCHAR(20),
+    Name VARCHAR(50),
+    CoverageType VARCHAR(50),
+    CostPerDay DECIMAL(8,2)
+);
+
+-- Insert Data into RentalCarInsurance Table
+INSERT INTO RentalCarInsurance (Code, Name, CoverageType, CostPerDay)
+VALUES 
+('BASIC', 'Basic Coverage', 'Collision', 5.00),
+('STANDARD', 'Standard Coverage', 'Collision + Theft', 10.00),
+('PREMIUM', 'Premium Coverage', 'Full Coverage', 20.00),
+('VIP', 'VIP Insurance', 'Full Coverage + Roadside', 25.00),
+('ECONOMY', 'Economy Plan', 'Basic Damage', 8.00);
+-- Create Customer Table
+CREATE TABLE Customer (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    FName VARCHAR(50),
+    MName VARCHAR(50),
+    LName VARCHAR(50),
+    PhoneNumber VARCHAR(15) UNIQUE NOT NULL,
+    DrivingLicense VARCHAR(20) UNIQUE NOT NULL,
+    EmailID VARCHAR(100) UNIQUE NOT NULL,
+    Address TEXT,
+    IsPremium BOOLEAN,
+    MemberID INT NULL,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert Data into Customer Table
+INSERT INTO Customer (FName, MName, LName, PhoneNumber, DrivingLicense, EmailID, Address, IsPremium, MemberID)
+VALUES 
+('John', 'A', 'Doe', '9876543210', 'DL123456', 'john.doe@email.com', '123 Main St, NY', TRUE, 1001),
+('Alice', 'B', 'Smith', '9123456789', 'DL654321', 'alice.smith@email.com', '456 Elm St, CA', FALSE, NULL),
+('Robert', 'C', 'Johnson', '9988776655', 'DL789123', 'robert.j@email.com', '789 Oak St, TX', TRUE, 1002),
+('Emma', 'D', 'Brown', '9765432109', 'DL567890', 'emma.b@email.com', '567 Pine St, FL', FALSE, NULL),
+('Michael', 'E', 'Williams', '9456789012', 'DL321654', 'michael.w@email.com', '678 Cedar St, IL', TRUE, 1003);
+
+-- Create Car Table
+CREATE TABLE Car (
+    RegistrationNumber VARCHAR(20) PRIMARY KEY,
+    AvailabilityFlag BOOLEAN NOT NULL,
+    ModelYear INT,
+    Model VARCHAR(50),
+    MadeBy VARCHAR(50),
+    Mileage DECIMAL(5,2)
+);
+
+-- Insert Data into Car Table
+INSERT INTO Car (RegistrationNumber, AvailabilityFlag, ModelYear, Model, MadeBy, Mileage)
+VALUES 
+('ABC123', TRUE, 2022, 'Model S', 'Tesla', 150.5),
+('XYZ456', TRUE, 2021, 'Civic', 'Honda', 40.0),
+('LMN789', FALSE, 2020, 'Corolla', 'Toyota', 42.5),
+('PQR321', TRUE, 2019, 'Camry', 'Toyota', 38.0),
+('DEF654', FALSE, 2023, 'Mustang', 'Ford', 25.0);
+
+-- Create Location Table
+CREATE TABLE Location (
+    LocationID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100),
+    State VARCHAR(50),
+    City VARCHAR(50),
+    ZipCode VARCHAR(10),
+    Street VARCHAR(100)
+);
+
+-- Insert Data into Location Table
+INSERT INTO Location (Name, State, City, ZipCode, Street)
+VALUES 
+('Downtown', 'NY', 'New York', '10001', '5th Ave'),
+('City Center', 'CA', 'Los Angeles', '90001', 'Main St'),
+('Airport Hub', 'TX', 'Dallas', '75001', 'Airport Rd'),
+('Suburb Branch', 'FL', 'Miami', '33101', 'Palm St'),
+('Metro Station', 'IL', 'Chicago', '60007', 'Railway Ave');
+
+-- Create Car Category Table
+CREATE TABLE CarCategory (
+    CategoryID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(50),
+    NumberOfLuggage INT,
+    NumberOfPerson INT,
+    CostPerDay DECIMAL(8,2),
+    LateFeePerHour DECIMAL(8,2)
+);
+
+-- Insert Data into CarCategory Table
+INSERT INTO CarCategory (Name, NumberOfLuggage, NumberOfPerson, CostPerDay, LateFeePerHour)
+VALUES 
+('Economy', 2, 4, 30.00, 5.00),
+('SUV', 4, 7, 70.00, 10.00),
+('Luxury', 3, 5, 120.00, 20.00),
+('Convertible', 1, 2, 90.00, 15.00),
+('Minivan', 5, 8, 80.00, 12.00);
+
+-- Create Booking Table
+CREATE TABLE Booking (
+    BookingID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT,
+    CarID VARCHAR(20),
+    PickUpLocation INT,
+    DropOffLocation INT,
+    StartDate DATE,
+    EndDate DATE,
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
+    FOREIGN KEY (CarID) REFERENCES Car(RegistrationNumber),
+    FOREIGN KEY (PickUpLocation) REFERENCES Location(LocationID),
+    FOREIGN KEY (DropOffLocation) REFERENCES Location(LocationID)
+);
+
+-- Insert Data into Booking Table
+INSERT INTO Booking (CustomerID, CarID, PickUpLocation, DropOffLocation, StartDate, EndDate)
+VALUES 
+(1, 'ABC123', 1, 2, '2025-02-10', '2025-02-15'),
+(2, 'XYZ456', 2, 3, '2025-02-11', '2025-02-16'),
+(3, 'LMN789', 3, 4, '2025-02-12', '2025-02-17'),
+(4, 'PQR321', 4, 5, '2025-02-13', '2025-02-18'),
+(5, 'DEF654', 5, 1, '2025-02-14', '2025-02-19');
+
+-- Create Billing Table
+CREATE TABLE Billing (
+    BillingID INT PRIMARY KEY AUTO_INCREMENT,
+    BookingID INT,
+    LateFee DECIMAL(8,2),
+    AmountDiscounted DECIMAL(8,2),
+    TotalAmount DECIMAL(10,2),
+    TaxAmount DECIMAL(8,2),
+    Status VARCHAR(50),
+    BillingDate DATE,
+    FOREIGN KEY (BookingID) REFERENCES Booking(BookingID)
+);
+
+-- Insert Data into Billing Table
+INSERT INTO Billing (BookingID, LateFee, AmountDiscounted, TotalAmount, TaxAmount, Status, BillingDate)
+VALUES 
+(1, 10.00, 5.00, 150.00, 15.00, 'Paid', '2025-02-16'),
+(2, 0.00, 10.00, 200.00, 20.00, 'Pending', '2025-02-17'),
+(3, 15.00, 0.00, 180.00, 18.00, 'Paid', '2025-02-18'),
+(4, 0.00, 5.00, 220.00, 22.00, 'Paid', '2025-02-19'),
+(5, 20.00, 10.00, 250.00, 25.00, 'Pending', '2025-02-20');
+
+-- Create Discount Table
+CREATE TABLE Discount (
+    DiscountID INT PRIMARY KEY AUTO_INCREMENT,
+    Code VARCHAR(20),
+    Name VARCHAR(50),
+    ExpiryDate DATE,
+    DiscountPercentage DECIMAL(5,2)
+);
+
+-- Insert Data into Discount Table
+INSERT INTO Discount (Code, Name, ExpiryDate, DiscountPercentage)
+VALUES 
+('WELCOME10', 'New User Discount', '2025-12-31', 10.00),
+('SUMMER20', 'Summer Sale', '2025-06-30', 20.00),
+('VIP30', 'Premium Members', '2025-12-31', 30.00),
+('FESTIVE15', 'Festival Discount', '2025-12-25', 15.00),
+('FLASH5', 'Flash Sale', '2025-03-15', 5.00);
+
+-- Create Rental Car Insurance Table
+CREATE TABLE RentalCarInsurance (
+    InsuranceID INT PRIMARY KEY AUTO_INCREMENT,
+    Code VARCHAR(20),
+    Name VARCHAR(50),
+    CoverageType VARCHAR(50),
+    CostPerDay DECIMAL(8,2)
+);
+
+-- Insert Data into RentalCarInsurance Table
+INSERT INTO RentalCarInsurance (Code, Name, CoverageType, CostPerDay)
+VALUES 
+('BASIC', 'Basic Coverage', 'Collision', 5.00),
+('STANDARD', 'Standard Coverage', 'Collision + Theft', 10.00),
+('PREMIUM', 'Premium Coverage', 'Full Coverage', 20.00),
+('VIP', 'VIP Insurance', 'Full Coverage + Roadside', 25.00),
+('ECONOMY', 'Economy Plan', 'Basic Damage', 8.00);
+
+-- Indexes 
+CREATE UNIQUE INDEX idx_discount_code ON Discount(Code);
+CREATE INDEX idx_discount_percentage ON Discount(DiscountPercentage);
+CREATE UNIQUE INDEX idx_insurance_code ON RentalCarInsurance(Code);
+CREATE INDEX idx_insurance_cost ON RentalCarInsurance(CostPerDay);
+
+-- Procedure 1 
+CREATE PROCEDURE GetCustomerBookings (IN customer_id INT)
+BEGIN
+    SELECT B.BookingID, C.FName, C.LName, B.CarID, B.StartDate, B.EndDate, L1.Name AS PickUpLocation, L2.Name AS DropOffLocation
+    FROM Booking B
+    JOIN Customer C ON B.CustomerID = C.CustomerID
+    JOIN Location L1 ON B.PickUpLocation = L1.LocationID
+    JOIN Location L2 ON B.DropOffLocation = L2.LocationID
+    WHERE B.CustomerID = customer_id;
+END;
+
+
+-- Procedure 2
+CREATE PROCEDURE ApplyDiscount (IN booking_id INT, IN discount_code VARCHAR(20))
+BEGIN
+    DECLARE discount_value DECIMAL(5,2);
+    DECLARE original_total DECIMAL(10,2);
+    DECLARE discount_amount DECIMAL(10,2);
+    -- Get discount percentage
+    SELECT DiscountPercentage INTO discount_value 
+    FROM Discount 
+    WHERE Code = discount_code AND ExpiryDate >= CURDATE();
+    -- If discount exists, apply it
+    IF discount_value IS NOT NULL THEN
+        SELECT TotalAmount INTO original_total FROM Billing WHERE BookingID = booking_id;
+        -- Calculate discount amount
+        SET discount_amount = (original_total * discount_value) / 100;
+
+        -- Update Billing Table
+        UPDATE Billing 
+        SET AmountDiscounted = discount_amount, 
+            TotalAmount = original_total - discount_amount
+        WHERE BookingID = booking_id;
+    END IF;
+END;
+
+
+-- View 1 
+CREATE VIEW View_CustomerBookings AS
+SELECT 
+    B.BookingID,
+    CONCAT(C.FName, ' ', C.MName, ' ', C.LName) AS CustomerName,
+    B.CustomerID,
+    B.CarID,
+    Car.Model,
+    Car.MadeBy,
+    B.PickUpLocation,
+    L1.Name AS PickUpLocationName,
+    B.DropOffLocation,
+    L2.Name AS DropOffLocationName,
+    B.StartDate,
+    B.EndDate
+FROM Booking B
+JOIN Customer C ON B.CustomerID = C.CustomerID
+JOIN Car ON B.CarID = Car.RegistrationNumber
+JOIN Location L1 ON B.PickUpLocation = L1.LocationID
+JOIN Location L2 ON B.DropOffLocation = L2.LocationID;
+
+-- View 2
+CREATE VIEW View_BillingSummary AS
+SELECT 
+    B.BillingID,
+    B.BookingID,
+    CONCAT(C.FName, ' ', C.MName, ' ', C.LName) AS CustomerName,
+    Car.Model AS CarModel,
+    Car.MadeBy AS CarMake,
+    B.TotalAmount,
+    B.AmountDiscounted,
+    B.LateFee,
+    B.TaxAmount,
+    B.Status,
+    B.BillingDate
+FROM Billing B
+JOIN Booking BK ON B.BookingID = BK.BookingID
+JOIN Customer C ON BK.CustomerID = C.CustomerID
+JOIN Car ON BK.CarID = Car.RegistrationNumber;
+
+
+-- Trigger 1
+CREATE TRIGGER before_billing_insert
+BEFORE INSERT ON Billing
+FOR EACH ROW
+SET NEW.TotalAmount = (NEW.TotalAmount + NEW.TaxAmount - NEW.AmountDiscounted);
+
+-- Trigger 2
+CREATE TRIGGER after_booking_insert
+AFTER INSERT ON Booking
+FOR EACH ROW
+UPDATE Car
+SET AvailabilityFlag = FALSE
+WHERE RegistrationNumber = NEW.CarID;
+
+
+
